@@ -1,0 +1,232 @@
+<html>
+
+<head>
+    <title>Isbah</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+        .customButton {
+            border: 1px solid gray;
+            padding: 2px 6px 2px 6px;
+            cursor: pointer;
+        }
+
+        .customButton:hover {
+            border: 1px solid black;
+            box-shadow: gray 2px 2px 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Marksheet</h1>
+    <div>
+        <table>
+            <tr>
+                <td>
+                    <table>
+                        <tr>
+                            <td>
+                                <span>Enter the name of student :</span>
+                            </td>
+                            <td>
+                                <input type="text" id="nameOfStudent" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span>Enter the number of subjects : </span>
+                            </td>
+                            <td>
+                                <input type="number" id="noOfSubjects" min="1" onchange="UIPopulate();security()"
+                                    onkeyup="UIPopulate();security()" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <button  onclick="Calculate()" class="customButton">Calculate</button>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    <table>
+                        <tr>
+                            <td>
+                                <span>Min Marks Subject: </span>
+                            </td>
+                            <td>
+                                <input type="text" id="minMarksSubject" readonly="readonly" />
+                            </td>
+                            <td>
+                                <span>Min Marks: </span>
+                            </td>
+                            <td>
+                                <input type="text" id="minMarks" readonly="readonly" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span>Max Marks Subject: </span>
+                            </td>
+                            <td>
+                                <input type="text" id="maxMarksSubject" readonly="readonly" />
+                            </td>
+                            <td>
+                                <span>Max Marks: </span>
+                            </td>
+                            <td>
+                                <input type="text" id="maxMarks" readonly="readonly" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span>Percentage : </span>
+                            </td>
+                            <td>
+                                <input type="text" id="percentage" readonly="readonly" />
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <hr />
+    <div>
+        <table id="inputTable">
+        </table>
+    </div>
+</body>
+<script>
+    var data = []
+    function security(){
+        const nameOfSubject = $(".subject_name");
+        const marksOfSubject = $(".marks_obtained");
+        var check1 = false;
+        var check2 = false;
+        for (let i = 0; i < nameOfSubject.length && nameOfSubject.length > 0; i++) {
+           if(nameOfSubject[i].value){
+               if(i+1 === nameOfSubject.length ){
+                   check1 = true;
+               }
+           }
+            
+        }
+        for (let i = 0; i < marksOfSubject.length && nameOfSubject.length > 0; i++) {
+           if(marksOfSubject[i].value){
+               if(i+1 === marksOfSubject.length){
+                   check2 = true;
+               }
+           }
+            
+        }
+//    console.log($("#noOfSubjects").val())  
+        if(!$("#noOfSubjects").val() && check1 === false && check2 === false){
+         
+        $(".customButton").attr("disabled","true") 
+    }
+    else if(check2 && check1){
+       
+        $(".customButton").removeAttr("disabled") 
+    }
+}
+$(window).on("load",security);
+
+    function Calculate() {
+        //YOUR CODE GOES HERE
+        var x = $("#inputTable");
+        const nameOfSubject = $(".subject_name");
+        const marksOfSubject = $(".marks_obtained");
+                   if(nameOfSubject.length && marksOfSubject.length){
+                   
+                      
+                   
+                   for (let i = 0; i < nameOfSubject.length; i++) {
+                        if(nameOfSubject[i].value && marksOfSubject[i].value){
+                          data = [
+                              ...data,
+                            {
+                                name:nameOfSubject[i].value,
+                                obtainedMarks:marksOfSubject[i].value
+                            }
+                        ]
+                        }
+                   }
+                   var check1 = false;
+        var check2 = false;
+        for (let i = 0; i < nameOfSubject.length && nameOfSubject.length > 0; i++) {
+           if(nameOfSubject[i].value){
+               if(i+1 === nameOfSubject.length ){
+                   check1 = true;
+               }
+           }
+            
+        }
+        for (let i = 0; i < marksOfSubject.length && nameOfSubject.length > 0; i++) {
+           if(marksOfSubject[i].value){
+               if(i+1 === marksOfSubject.length){
+                   check2 = true;
+               }
+           }
+            
+        }
+                if(check1 && check2){
+                    $.ajax({
+                        method: "GET",
+        url: "https://localhost:44377/Ipt_assignment_2.asmx/calculateMarksheet",
+        contentType: "application/JSON",
+         
+            data: {request: JSON.stringify(data),}
+            // contentType:false,
+            // processData:false
+        
+        })
+        .done(function (response) {
+            console.log(response,"response");
+               
+        })
+        .fail(function (XMLHttpRequest, textStatus, errorThrown) {
+            alert("Fail");
+        });
+     
+            
+                  data = []
+                }
+                
+                   }
+    }
+
+    function UIPopulate() {
+        var noOfSubjects = $('#noOfSubjects').val();
+
+        var h = '';
+        for (i = 0; i < noOfSubjects; i++) {
+            h += '<tr>';
+
+            h += '<td>';
+            h += '<span>Subject ' + (i + 1) + ' -> </span>';
+            h += '</td>';
+
+            h += '<td>';
+            h += '<span>Name :</span>';
+            h += '</td>';
+
+            h += '<td>';
+            h += '<input type="text" onkeyup="security()" class="subject_name" id="subjectName' + i + '"/>';
+            h += '</td>';
+
+            h += '<td>';
+            h += '<span>Marks Obtained :</span>';
+            h += '</td>';
+
+            h += '<td>';
+            h += '<input type="number" onkeyup="security()" min="0" max="100" class="marks_obtained" id="subjectMarksObtained' + i + '"/>';
+            h += '</td>';
+
+            h += '</tr>';
+        }
+
+        $('#inputTable').html(h);
+    }
+</script>
+</html>
